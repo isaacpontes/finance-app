@@ -1,3 +1,4 @@
+import PrimaryButton from "@/components/PrimaryButton";
 import { globalStyles } from "@/styles/global";
 import { Image, Text, View } from "react-native";
 
@@ -10,6 +11,14 @@ const transactions = [
 
 export default function Index() {
   const name = "Isaac"
+
+  const hanldeAddIncome = () => {
+    alert("Adicionar receita")
+  }
+
+  const hanldeAddExpense = () => {
+    alert("Adicionar despesa")
+  }
 
   return (
     <View style={globalStyles.container}>
@@ -29,17 +38,8 @@ export default function Index() {
       </Text>
 
       <View style={globalStyles.buttonsContainer}>
-        <View style={globalStyles.button}>
-          <Text style={globalStyles.buttonText}>
-            Adicionar Receita
-          </Text>
-        </View>
-
-        <View style={globalStyles.button}>
-          <Text style={globalStyles.buttonText}>
-            Adicionar Despesa
-          </Text>
-        </View>
+        <PrimaryButton title="Adicionar receita" onPress={hanldeAddIncome} />
+        <PrimaryButton title="Adicionar despesa" onPress={hanldeAddExpense} />
       </View>
 
       <Text style={globalStyles.sectionTitle}>

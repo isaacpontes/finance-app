@@ -30,16 +30,6 @@ export const globalStyles = StyleSheet.create({
         gap: 10,
         marginBottom: 20,
     },
-    button: {
-        backgroundColor: '#2C5F30',
-        borderRadius: 10,
-        elevation: 2,
-        padding: 10,
-    },
-    buttonText: {
-        color: '#FFF',
-        fontWeight: '700',
-    },
     sectionTitle: {
         fontSize: 20,
         fontWeight: '500',
