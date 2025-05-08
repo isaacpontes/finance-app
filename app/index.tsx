@@ -1,5 +1,7 @@
 import PrimaryButton from "@/components/PrimaryButton";
+import { TransactionsModal } from "@/components/TransactionsModal";
 import { globalStyles } from "@/styles/global";
+import { useState } from "react";
 import { Image, Text, View } from "react-native";
 
 const transactions = [
@@ -10,14 +12,12 @@ const transactions = [
 ];
 
 export default function Index() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const name = "Isaac"
 
-  const hanldeAddIncome = () => {
+  const hanldeAddTransaction = (data: { description: string, amount: number }) => {
+    console.log(data)
     alert("Adicionar receita")
-  }
-
-  const hanldeAddExpense = () => {
-    alert("Adicionar despesa")
   }
 
   return (
@@ -38,9 +38,14 @@ export default function Index() {
       </Text>
 
       <View style={globalStyles.buttonsContainer}>
-        <PrimaryButton title="Adicionar receita" onPress={hanldeAddIncome} />
-        <PrimaryButton title="Adicionar despesa" onPress={hanldeAddExpense} />
+        <PrimaryButton title="Adicionar transação" onPress={() => setIsModalOpen(true)} />
       </View>
+
+      <TransactionsModal
+        visible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={hanldeAddTransaction}
+      />
 
       <Text style={globalStyles.sectionTitle}>
         Transações Recentes
