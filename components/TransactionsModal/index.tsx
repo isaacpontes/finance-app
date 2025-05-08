@@ -13,11 +13,15 @@ export const TransactionsModal: React.FC<TransactionsModalProps> = ({ visible, o
   const [description, setDescription] = useState('')
   const [amount, setAmount] = useState('')
   const [datetimeDetail, setDatetimeDetail] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    setIsLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 2000))
     onSave({ description: description, amount: Number(amount) })
     setDescription('')
     setAmount('')
+    setIsLoading(false)
     onClose()
   }
 
@@ -48,7 +52,7 @@ export const TransactionsModal: React.FC<TransactionsModalProps> = ({ visible, o
         <View style={{ marginBottom: 20 }}>
           <Text>Detalhar data e hora?</Text>
           <Switch
-            style={{ marginRight: 'auto' }} 
+            style={{ marginRight: 'auto' }}
             value={datetimeDetail}
             onValueChange={newValue => setDatetimeDetail(newValue)}
           />
@@ -58,7 +62,7 @@ export const TransactionsModal: React.FC<TransactionsModalProps> = ({ visible, o
 
 
         <View style={styles.buttonsContainer}>
-          <PrimaryButton title="Salvar transação" onPress={handleSave} />
+          <PrimaryButton title="Salvar transação" loading={isLoading} onPress={handleSave} />
 
           <Pressable style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Fechar</Text>

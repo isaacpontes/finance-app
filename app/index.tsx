@@ -2,7 +2,7 @@ import PrimaryButton from "@/components/PrimaryButton";
 import { TransactionsModal } from "@/components/TransactionsModal";
 import { globalStyles } from "@/styles/global";
 import { useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Image, StatusBar, Text, View } from "react-native";
 
 const transactions = [
   { id: '1', description: 'Supermercado', amount: -50.75 },
@@ -17,11 +17,13 @@ export default function Index() {
 
   const hanldeAddTransaction = (data: { description: string, amount: number }) => {
     console.log(data)
-    alert("Adicionar receita")
+    alert('Transação salva com sucesso!')
   }
 
   return (
     <View style={globalStyles.container}>
+      <StatusBar barStyle={'light-content'} backgroundColor={'#2C5F30'} />
+
       <Image
         source={require('@/assets/images/finance-logo.png')}
         style={globalStyles.logo}

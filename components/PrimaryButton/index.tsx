@@ -1,10 +1,13 @@
-import { Pressable, Text } from "react-native"
+import { ActivityIndicator, Pressable, Text } from "react-native"
 import styles from "./styles"
 
-const PrimaryButton: React.FC<{
+interface PrimaryButtonProps {
   title: string,
+  loading?: boolean,
   onPress: () => void
-}> = ({ title, onPress }) => {
+}
+
+const PrimaryButton: React.FC<PrimaryButtonProps> = ({ title, loading, onPress }) => {
   return (
     <Pressable
       onPress={onPress}
@@ -13,11 +16,15 @@ const PrimaryButton: React.FC<{
         { backgroundColor: pressed ? '#999' : '#2C5F30' }
       ]}
     >
-      {({ pressed }) => (
-        <Text style={styles.buttonText}>
-          {pressed ? 'pressionado...' : title}
-        </Text>
-      )}
+      {
+        loading ? (
+          <ActivityIndicator color={'#fff'} style={{ width: 100 }} />
+        ) : (
+          <Text style={styles.buttonText}>
+            {title}
+          </Text>
+        )
+      }
     </Pressable>
   )
 }
