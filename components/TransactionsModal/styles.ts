@@ -12,7 +12,8 @@ export const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 5,
     padding: 10,
-    marginBottom: 20
+    marginTop: 10,
+    marginBottom: 20,
   },
   buttonsContainer: {
     alignItems: 'center',
