@@ -1,17 +1,18 @@
 import PrimaryButton from "@/components/PrimaryButton";
 import { TransactionsModal } from "@/components/TransactionsModal";
+import { useTransactions } from "@/hooks/useTransactions";
 import { globalStyles } from "@/styles/global";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Image, StatusBar, Text, View } from "react-native";
-
+import { Image, Pressable, ScrollView, StatusBar, Text, View } from "react-native";
 
 export default function Index() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const name = "Isaac"
+  const { balance, addTransaction, getLastTransactions } = useTransactions()
 
   const hanldeAddTransaction = (data: { description: string, amount: number }) => {
-    console.log(data)
+    addTransaction(data)
     alert('Transação salva com sucesso!')
   }
 
@@ -31,16 +32,12 @@ export default function Index() {
         Saldo Atual
       </Text>
       <Text style={globalStyles.balance}>
-        R$ 1.529,85
+        R$ {balance.toFixed(2)}
       </Text>
 
       <View style={globalStyles.buttonsContainer}>
         <PrimaryButton title="Adicionar transação" onPress={() => setIsModalOpen(true)} />
       </View>
-
-      <Text style={globalStyles.sectionTitle}>
-        Transações Recentes
-      </Text>
 
       <TransactionsModal
         visible={isModalOpen}
@@ -48,11 +45,35 @@ export default function Index() {
         onSave={hanldeAddTransaction}
       />
 
-      <View style={{ marginVertical: 20 }}>
-        <Link href={"/transactions"} style={{ fontSize: 20 }}>
-          Ver transações
-        </Link>
-      </View>
+      <Text style={globalStyles.sectionTitle}>
+        Transações Recentes
+      </Text>
+
+      <ScrollView>
+        {getLastTransactions().map(transaction => (
+          <Link
+            href={{ pathname: '/transactions/[id]', params: { id: transaction.id } }}
+            key={transaction.id}
+            asChild
+          >
+            <Pressable>
+              <View style={globalStyles.transactionItem}>
+                <Text style={globalStyles.transactionText}>
+                  {transaction.description}
+                </Text>
+                <Text
+                  style={[
+                    globalStyles.transactionAmount,
+                    transaction.amount > 0 ? globalStyles.income : globalStyles.expense,
+                  ]}
+                >
+                  R$ {transaction.amount}
+                </Text>
+              </View>
+            </Pressable>
+          </Link>
+        ))}
+      </ScrollView>
     </View>
   );
 }
