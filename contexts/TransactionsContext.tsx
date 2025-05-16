@@ -24,6 +24,9 @@ type TransactionsContextProps = {
   transactions: Transaction[]
   addTransaction: (data: AddTransactionInput) => Transaction
   getLastTransactions: (limit?: number) => Transaction[]
+  findTransactionById: (id: string) => Transaction | undefined
+  updateTransaction: (id: string, attributes: Partial<Transaction>) => void
+  deleteTransaction: (id: string) => void
 }
 
 export const TransactionsContext = createContext<TransactionsContextProps | null>(null)
@@ -32,13 +35,18 @@ export const TransactionsContextProvider: React.FC<{
   children: ReactNode
 }> = ({ children }) => {
   // estados das transações
-  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions)
-  const balance = 0
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  // calcular o saldo baseado no estado de transações
+  const balance = transactions.reduce((sum, t) => sum + t.amount, 0)
 
   const getLastTransactions = (limit = 5) => {
     return [...transactions]
       .sort((a, b) => b.referenceDate.getTime() - a.referenceDate.getTime())
       .slice(0, limit)
+  }
+
+  const findTransactionById = (id: string) => {
+    return transactions.find(t => t.id === id)
   }
 
   const addTransaction = (data: AddTransactionInput) => {
@@ -52,13 +60,28 @@ export const TransactionsContextProvider: React.FC<{
     return newTransaction
   }
 
+  const updateTransaction = (id: string, attributes: Partial<Transaction>) => {
+    setTransactions(current => current.map(transaction => (
+      transaction.id === id
+        ? { ...transaction, ...attributes, id: transaction.id }
+        : transaction
+    )))
+  }
+
+  const deleteTransaction = (id: string) => {
+    setTransactions(current => current.filter(transaction => transaction.id !== id))
+  }
+
   return (
     <TransactionsContext.Provider
       value={{
         balance,
         transactions,
         addTransaction,
-        getLastTransactions
+        getLastTransactions,
+        findTransactionById,
+        updateTransaction,
+        deleteTransaction
       }}
     >
       {children}

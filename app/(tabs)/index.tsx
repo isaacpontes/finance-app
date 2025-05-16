@@ -1,17 +1,17 @@
-import PrimaryButton from "@/components/PrimaryButton";
+import Button from "@/components/Button";
+import TransactionListItem from "@/components/TransactionListItem";
 import { TransactionsModal } from "@/components/TransactionsModal";
 import { useTransactions } from "@/hooks/useTransactions";
 import { globalStyles } from "@/styles/global";
-import { Link } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, ScrollView, StatusBar, Text, View } from "react-native";
+import { Image, ScrollView, StatusBar, Text, View } from "react-native";
 
 export default function Index() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const name = "Isaac"
   const { balance, addTransaction, getLastTransactions } = useTransactions()
 
-  const hanldeAddTransaction = (data: { description: string, amount: number }) => {
+  const hanldeAddTransaction = (data: { description: string, amount: number, referenceDate: Date }) => {
     addTransaction(data)
     alert('Transação salva com sucesso!')
   }
@@ -36,7 +36,7 @@ export default function Index() {
       </Text>
 
       <View style={globalStyles.buttonsContainer}>
-        <PrimaryButton title="Adicionar transação" onPress={() => setIsModalOpen(true)} />
+        <Button title="Adicionar transação" onPress={() => setIsModalOpen(true)} />
       </View>
 
       <TransactionsModal
@@ -51,27 +51,7 @@ export default function Index() {
 
       <ScrollView>
         {getLastTransactions().map(transaction => (
-          <Link
-            href={{ pathname: '/transactions/[id]', params: { id: transaction.id } }}
-            key={transaction.id}
-            asChild
-          >
-            <Pressable>
-              <View style={globalStyles.transactionItem}>
-                <Text style={globalStyles.transactionText}>
-                  {transaction.description}
-                </Text>
-                <Text
-                  style={[
-                    globalStyles.transactionAmount,
-                    transaction.amount > 0 ? globalStyles.income : globalStyles.expense,
-                  ]}
-                >
-                  R$ {transaction.amount}
-                </Text>
-              </View>
-            </Pressable>
-          </Link>
+          <TransactionListItem transaction={transaction} key={transaction.id} />
         ))}
       </ScrollView>
     </View>

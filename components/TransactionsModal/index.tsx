@@ -1,26 +1,42 @@
 import { useState } from "react"
 import { Modal, Pressable, Switch, Text, TextInput, View } from "react-native"
-import PrimaryButton from "../PrimaryButton"
+import Button from "../Button"
 import { styles } from "./styles"
 
 interface TransactionsModalProps {
   visible: boolean
+  initialDescription?: string
+  initialAmount?: string
+  initialReferenceDate?: string
   onClose: () => void
-  onSave: (data: { description: string, amount: number }) => void
+  onSave: (data: { description: string, amount: number, referenceDate: Date }) => void
 }
 
-export const TransactionsModal: React.FC<TransactionsModalProps> = ({ visible, onClose, onSave }) => {
-  const [description, setDescription] = useState('')
-  const [amount, setAmount] = useState('')
+export const TransactionsModal: React.FC<TransactionsModalProps> = ({
+  visible,
+  initialAmount,
+  initialDescription,
+  initialReferenceDate,
+  onClose,
+  onSave
+}) => {
+  const [description, setDescription] = useState(initialDescription ?? '')
+  const [amount, setAmount] = useState(initialAmount ?? '')
+  const [referenceDate, setReferenceDate] = useState(initialReferenceDate ?? '')
   const [datetimeDetail, setDatetimeDetail] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSave = async () => {
     setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    onSave({ description: description, amount: Number(amount) })
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    onSave({
+      description: description,
+      amount: Number(amount),
+      referenceDate: datetimeDetail ? new Date(referenceDate) : new Date()
+    })
     setDescription('')
     setAmount('')
+    setReferenceDate('')
     setIsLoading(false)
     onClose()
   }
@@ -57,12 +73,19 @@ export const TransactionsModal: React.FC<TransactionsModalProps> = ({ visible, o
             onValueChange={newValue => setDatetimeDetail(newValue)}
           />
 
-          {datetimeDetail && <TextInput placeholder="Informe a data e hora" style={styles.textInput} />}
+          {datetimeDetail &&
+            <TextInput
+              placeholder="Informe a data e hora"
+              style={styles.textInput}
+              value={referenceDate}
+              onChangeText={text => setReferenceDate(text)}
+            />
+          }
         </View>
 
 
         <View style={styles.buttonsContainer}>
-          <PrimaryButton title="Salvar transação" loading={isLoading} onPress={handleSave} />
+          <Button title="Salvar transação" loading={isLoading} onPress={handleSave} />
 
           <Pressable style={styles.closeButton} onPress={onClose}>
             <Text style={styles.closeButtonText}>Fechar</Text>
