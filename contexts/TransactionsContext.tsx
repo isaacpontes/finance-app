@@ -1,5 +1,6 @@
 import { Transaction } from "@/entities/Transaction";
-import { createContext, ReactNode, useState } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createContext, ReactNode, useEffect, useState } from "react";
 
 const initialTransactions: Transaction[] = [
   { id: '1', description: 'Supermercado', amount: -50.75, referenceDate: new Date('2025-01-02') },
@@ -22,7 +23,7 @@ type AddTransactionInput = {
 type TransactionsContextProps = {
   balance: number
   transactions: Transaction[]
-  addTransaction: (data: AddTransactionInput) => Transaction
+  addTransaction: (data: AddTransactionInput) => Promise<Transaction>
   getLastTransactions: (limit?: number) => Transaction[]
   findTransactionById: (id: string) => Transaction | undefined
   updateTransaction: (id: string, attributes: Partial<Transaction>) => void
@@ -39,6 +40,18 @@ export const TransactionsContextProvider: React.FC<{
   // calcular o saldo baseado no estado de transações
   const balance = transactions.reduce((sum, t) => sum + t.amount, 0)
 
+  useEffect(() => {
+    const loadItems = async () => {
+      let transactions = await AsyncStorage.getItem('fin-app-transactions')
+      const transactionsArray = JSON.parse(transactions ?? '[]').map((t: Transaction) => ({
+        ...t,
+        referenceDate: new Date(t.referenceDate)
+      }))
+      setTransactions(transactionsArray)
+    }
+    loadItems()
+  }, [])
+
   const getLastTransactions = (limit = 5) => {
     return [...transactions]
       .sort((a, b) => b.referenceDate.getTime() - a.referenceDate.getTime())
@@ -49,27 +62,33 @@ export const TransactionsContextProvider: React.FC<{
     return transactions.find(t => t.id === id)
   }
 
-  const addTransaction = (data: AddTransactionInput) => {
+  const addTransaction = async (data: AddTransactionInput) => {
     const newTransaction: Transaction = {
       id: Math.floor(Math.random() * 999999).toString(),
       description: data.description,
       amount: data.amount,
       referenceDate: data.referenceDate ?? new Date()
     }
+    const updatedTransactions = [...transactions, newTransaction]
+    await AsyncStorage.setItem('fin-app-transactions', JSON.stringify(updatedTransactions))
     setTransactions(current => [...current, newTransaction])
     return newTransaction
   }
 
-  const updateTransaction = (id: string, attributes: Partial<Transaction>) => {
-    setTransactions(current => current.map(transaction => (
+  const updateTransaction = async (id: string, attributes: Partial<Transaction>) => {
+    const updatedTransactions = transactions.map(transaction => (
       transaction.id === id
         ? { ...transaction, ...attributes, id: transaction.id }
         : transaction
-    )))
+    ))
+    await AsyncStorage.setItem('fin-app-transactions', JSON.stringify(updatedTransactions))
+    setTransactions(updatedTransactions)
   }
 
-  const deleteTransaction = (id: string) => {
-    setTransactions(current => current.filter(transaction => transaction.id !== id))
+  const deleteTransaction = async (id: string) => {
+    const updatedTransactions = transactions.filter(transaction => transaction.id !== id)
+    await AsyncStorage.setItem('fin-app-transactions', JSON.stringify(updatedTransactions))
+    setTransactions(updatedTransactions)
   }
 
   return (
