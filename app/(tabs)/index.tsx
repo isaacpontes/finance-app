@@ -3,17 +3,49 @@ import TransactionListItem from "@/components/TransactionListItem";
 import { TransactionsModal } from "@/components/TransactionsModal";
 import { useTransactions } from "@/hooks/useTransactions";
 import { globalStyles } from "@/styles/global";
-import { useState } from "react";
-import { Image, ScrollView, StatusBar, Text, View } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
+import { Image, ScrollView, StatusBar, Text, TextInput, View } from "react-native";
 
 export default function Index() {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const name = "Isaac"
   const { balance, addTransaction, getLastTransactions } = useTransactions()
+  const [identity, setIdentity] = useState<string | null>(null)
+  const [nameInput, setNameInput] = useState('')
 
   const hanldeAddTransaction = (data: { description: string, amount: number, referenceDate: Date }) => {
     addTransaction(data)
     alert('Transação salva com sucesso!')
+  }
+
+  useEffect(() => {
+    const loadIdentity = async () => {
+      const value = await SecureStore.getItemAsync('fin-app-id')
+      setIdentity(value)
+    }
+    loadIdentity()
+  }, [])
+
+  if (!identity) {
+    return (
+      <View style={[globalStyles.container, { flex: 1, alignItems: 'center', justifyContent: 'center' }]}>
+        <Text style={globalStyles.sectionTitle}>Identifique-se</Text>
+
+        <TextInput
+          placeholder="Seu nome..."
+          value={nameInput}
+          onChangeText={text => setNameInput(text)}
+          style={{ marginVertical: 20 }}
+        />
+        <Button
+          title="Entrar"
+          onPress={async () => {
+            await SecureStore.setItemAsync('fin-app-id', nameInput)
+            setIdentity(nameInput)
+          }}
+        />
+      </View>
+    )
   }
 
   return (
@@ -26,7 +58,7 @@ export default function Index() {
       />
 
       <Text style={globalStyles.greeting}>
-        Olá, {name}!
+        Olá, {identity || 'visitante'}!
       </Text>
       <Text style={globalStyles.balanceLabel}>
         Saldo Atual
