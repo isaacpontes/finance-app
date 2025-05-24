@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 
 export const globalStyles = StyleSheet.create({
     container: {
@@ -13,6 +13,11 @@ export const globalStyles = StyleSheet.create({
         marginHorizontal: 'auto'
     },
     greeting: {
+        // fontFamily: 'NunitoSans',
+        fontFamily: Platform.select({
+            android: 'Montserrat_400Regular',
+            ios: 'Montserrat-Regular',
+        }),
         fontSize: 24,
         marginBottom: 20
     },
